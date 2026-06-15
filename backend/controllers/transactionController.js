@@ -48,6 +48,14 @@ export const deleteTransaction = async (req, res) => {
   }
 };
 
+export const deleteAllTransactions = async (req, res) => {
+  try {
+    await Transaction.deleteMany({ user: req.user._id });
+    res.json({ message: 'All transactions deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete all transactions' });
+  }
+};
 
 export const getAnalytics = async (req, res) => {
   try {
