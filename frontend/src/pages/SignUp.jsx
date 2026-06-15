@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://expense-tracker-hzdo.onrender.com/api';
 
 const SignUp = ({ onSwitchToSignIn }) => {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });

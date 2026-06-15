@@ -28,7 +28,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:5000/api/auth/signin', formData);
+      const res = await axios.post('https://expense-tracker-hzdo.onrender.com/api/auth/signin', formData);
       localStorage.setItem('userInfo', JSON.stringify(res.data));
       window.location.href = '/dashboard';
     } catch (err) {
