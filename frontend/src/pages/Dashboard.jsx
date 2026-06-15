@@ -7,7 +7,7 @@ import {
   ChevronRight, Trash2, Grid3X3
 } from 'lucide-react';
 
-const API = import.meta.env.VITE_API_URL;
+const API = 'https://expense-tracker-hzdo.onrender.com/api';
 
 const fmt = (val) => `₦${Number(val).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
