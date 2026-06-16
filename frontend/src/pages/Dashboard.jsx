@@ -4,7 +4,7 @@ import {
   Wallet, TrendingUp, TrendingDown,
   PlusCircle, LayoutDashboard, BarChart3, LogOut,
   Sun, Moon, FileText, Download, AlertTriangle,
-  ChevronRight, Trash2, Grid3X3
+  ChevronRight, Trash2, Grid3X3, Menu, X
 } from 'lucide-react';
 
 const API = 'https://expense-tracker-hzdo.onrender.com/api';
@@ -272,6 +272,7 @@ const generateInsights = (transactions) => {
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [animateCharts, setAnimateCharts] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -438,32 +439,60 @@ const Dashboard = () => {
     <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${dm ? 'bg-[#0F172A] text-slate-100' : 'bg-[#F8F9FD] text-slate-800'}`}>
 
 
-      <header className={`px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-50 border-b shadow-sm transition-colors duration-300 ${dm ? 'bg-[#1E293B] border-slate-700' : 'bg-white border-slate-100'}`}>
-        <div className="flex items-center gap-2.5">
-          <div className="bg-[#4F46E5] text-white p-2 rounded-xl"><Wallet className="w-5 h-5" /></div>
-          <span className={`font-bold text-lg tracking-tight ${text}`}>ExpenseTracker</span>
+      <header className={`px-4 sm:px-8 py-4 sticky top-0 z-50 border-b shadow-sm transition-colors duration-300 ${dm ? 'bg-[#1E293B] border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-[#4F46E5] text-white p-2 rounded-xl"><Wallet className="w-5 h-5" /></div>
+            <span className={`font-bold text-lg tracking-tight ${text}`}>ExpenseTracker</span>
+          </div>
+
+          {/* Desktop nav */}
+          <nav className="hidden sm:flex items-center gap-2 sm:gap-4">
+            {[['dashboard', 'Dashboard', LayoutDashboard], ['analytics', 'Analytics', BarChart3]].map(([tab, label, Icon]) => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeTab === tab ? 'bg-[#EEF2FF] text-[#4F46E5]' : `text-slate-400 hover:bg-slate-50 ${dm ? 'hover:bg-slate-800' : ''}`}`}>
+                <Icon className="w-4 h-4" />{label}
+              </button>
+            ))}
+            <div className={`h-6 w-px mx-1 ${dm ? 'bg-slate-700' : 'bg-slate-200'}`} />
+            <button onClick={() => setDarkMode(!dm)}
+              className={`p-2 rounded-xl border transition-all cursor-pointer ${dm ? 'border-slate-700 bg-slate-800 text-amber-400 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'}`}>
+              {dm ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button onClick={handleLogout}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+              <LogOut className="w-3.5 h-3.5" /><span>Log Out</span>
+            </button>
+          </nav>
+
+          {/* Mobile: dark mode toggle + hamburger */}
+          <div className="flex items-center gap-2 sm:hidden">
+            <button onClick={() => setDarkMode(!dm)}
+              className={`p-2 rounded-xl border transition-all cursor-pointer ${dm ? 'border-slate-700 bg-slate-800 text-amber-400' : 'border-slate-200 bg-white text-slate-500'}`}>
+              {dm ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`p-2 rounded-xl border transition-all cursor-pointer ${dm ? 'border-slate-700 bg-slate-800 text-slate-300' : 'border-slate-200 bg-white text-slate-600'}`}>
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
-        <nav className="flex items-center gap-2 sm:gap-4">
-          {[['dashboard', 'Dashboard', LayoutDashboard], ['analytics', 'Analytics', BarChart3]].map(([tab, label, Icon]) => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeTab === tab ? 'bg-[#EEF2FF] text-[#4F46E5]' : `text-slate-400 hover:bg-slate-50 ${dm ? 'hover:bg-slate-800' : ''}`}`}>
-              <Icon className="w-4 h-4" /><span className="hidden sm:inline">{label}</span>
+        {/* Mobile dropdown */}
+        {mobileMenuOpen && (
+          <div className={`sm:hidden mt-3 pt-3 border-t space-y-1 ${dm ? 'border-slate-700' : 'border-slate-100'}`}>
+            {[['dashboard', 'Dashboard', LayoutDashboard], ['analytics', 'Analytics', BarChart3]].map(([tab, label, Icon]) => (
+              <button key={tab} onClick={() => { setActiveTab(tab); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeTab === tab ? 'bg-[#EEF2FF] text-[#4F46E5]' : `text-slate-500 ${dm ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}`}>
+                <Icon className="w-4 h-4" />{label}
+              </button>
+            ))}
+            <button onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all cursor-pointer">
+              <LogOut className="w-4 h-4" />Log Out
             </button>
-          ))}
-
-          <div className={`h-6 w-px mx-1 ${dm ? 'bg-slate-700' : 'bg-slate-200'}`} />
-
-          <button onClick={() => setDarkMode(!dm)}
-            className={`p-2 rounded-xl border transition-all cursor-pointer ${dm ? 'border-slate-700 bg-slate-800 text-amber-400 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'}`}>
-            {dm ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          <button onClick={handleLogout}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
-            <LogOut className="w-3.5 h-3.5" /><span>Log Out</span>
-          </button>
-        </nav>
+          </div>
+        )}
       </header>
 
       <main className="p-4 sm:p-8 max-w-[1400px] mx-auto space-y-8">
