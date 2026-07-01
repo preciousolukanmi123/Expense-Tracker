@@ -46,6 +46,11 @@ const SignUp = ({ onSwitchToSignIn }) => {
       
       setSuccess(true);
       setFormData({ email: '', password: '', confirmPassword: '' });
+
+      // Give the user a moment to see the success message, then send them to login
+      setTimeout(() => {
+        onSwitchToSignIn();
+      }, 1500);
     } catch (err) {
       const backendMessage = err.response?.data?.message;
       
@@ -96,7 +101,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
 
           {success && (
             <div className="mb-6 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-medium">
-              Account created successfully! You can now sign in.
+              Account created successfully! Redirecting you to sign in...
             </div>
           )}
 
