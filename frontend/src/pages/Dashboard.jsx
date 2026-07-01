@@ -3,8 +3,8 @@ import axios from 'axios';
 import {
   Wallet, TrendingUp, TrendingDown,
   PlusCircle, LayoutDashboard, BarChart3, LogOut,
-  Sun, Moon, FileText, Download, AlertTriangle,
-  ChevronRight, Trash2, Grid3X3, Menu, X
+  Sun, Moon, FileText, Download,
+  Trash2, Grid3X3, Menu, X
 } from 'lucide-react';
 
 const API = 'https://expense-tracker-hzdo.onrender.com/api';
@@ -222,52 +222,6 @@ const BarChart = ({ transactions, animate }) => {
   );
 };
 
-const generateInsights = (transactions) => {
-  const insights = [];
-  if (transactions.length < 2) return insights;
-
-  const now = new Date();
-  const thisMonth = now.getMonth();
-  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
-  const thisYear = now.getFullYear();
-  const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
-
-  const byCategory = {};
-  transactions.filter(t => t.type === 'expense').forEach(t => {
-    const d = new Date(t.date);
-    const m = d.getMonth();
-    const y = d.getFullYear();
-    if (!byCategory[t.category]) byCategory[t.category] = { this: 0, last: 0 };
-    if (m === thisMonth && y === thisYear) byCategory[t.category].this += t.amount;
-    if (m === lastMonth && y === lastYear) byCategory[t.category].last += t.amount;
-  });
-
-  Object.entries(byCategory).forEach(([cat, { this: cur, last: prev }]) => {
-    if (prev > 0 && cur > prev) {
-      const pct = Math.round(((cur - prev) / prev) * 100);
-      if (pct >= 10) {
-        insights.push({ type: 'warning', message: `Your <strong>${cat}</strong> spending is ${pct}% higher than last month.` });
-      }
-    }
-    if (prev > 0 && cur < prev) {
-      const pct = Math.round(((prev - cur) / prev) * 100);
-      if (pct >= 10) {
-        insights.push({ type: 'positive', message: `Great job! <strong>${cat}</strong> spending is down ${pct}% from last month.` });
-      }
-    }
-  });
-
-  const thisMonthExpenses = transactions
-    .filter(t => t.type === 'expense' && new Date(t.date).getMonth() === thisMonth && new Date(t.date).getFullYear() === thisYear)
-    .reduce((s, t) => s + t.amount, 0);
-  const dailyRate = thisMonthExpenses / new Date(thisYear, thisMonth + 1, 0).getDate();
-  if (dailyRate > 1000) {
-    insights.push({ type: 'info', message: `Your daily spending rate is <strong>₦${dailyRate.toFixed(0)}/day</strong> this month.` });
-  }
-
-  return insights.slice(0, 3);
-};
-
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -422,7 +376,6 @@ const Dashboard = () => {
   const catChangePct = lastMonthCatTotal > 0 ? Math.round(((thisMonthCatTotal - lastMonthCatTotal) / lastMonthCatTotal) * 100) : null;
 
   const dailyAvg = expenseTotal / 30;
-  const insights = generateInsights(transactions);
 
   const CATEGORY_COLORS = {
     'Housing': '#4F46E5', 'Food & Dining': '#059669', 'Groceries': '#0ea5e9',
@@ -759,26 +712,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {insights.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className={`text-lg font-bold ${text}`}>Smart Insights</h3>
-                    <div className="space-y-3">
-                      {insights.map((ins, i) => (
-                        <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border ${dm ? 'bg-[#1E293B] border-slate-700' : 'bg-white border-slate-100'}`}>
-                          <div className="flex items-center gap-3">
-                            <div className={`p-1.5 rounded-lg ${ins.type === 'warning' ? 'bg-rose-50' : ins.type === 'positive' ? 'bg-emerald-50' : 'bg-indigo-50'}`}>
-                              <AlertTriangle className={`w-4 h-4 ${ins.type === 'warning' ? 'text-rose-500' : ins.type === 'positive' ? 'text-emerald-500' : 'text-[#4F46E5]'}`} />
-                            </div>
-                            <p className="text-sm text-slate-600" dangerouslySetInnerHTML={{ __html: ins.message }} />
-                          </div>
-                          <button className="text-[11px] font-bold text-[#4F46E5] uppercase tracking-wide flex items-center gap-1 hover:underline cursor-pointer flex-shrink-0 ml-4">
-                            Details <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </>
             )}
           </div>
